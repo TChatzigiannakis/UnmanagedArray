@@ -1,0 +1,6 @@
+UnmanagedArray/obj/
+UnmanagedArray/bin/
+packages/
+Tests/obj/
+Tests/bin/
+.vs/
