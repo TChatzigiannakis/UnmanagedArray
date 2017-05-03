@@ -3,6 +3,10 @@ using System;
 
 namespace UnmanagedArray
 {
+    /// <summary>
+    /// Represents an array of structs stored in unmanaged memory.
+    /// </summary>
+    /// <typeparam name="T">The type of the array's elements. Must be a value type.</typeparam>
     public unsafe partial class Array<T>
     {
         public static implicit operator IntPtr(Array<T> e) => e.Buffer;
