@@ -32,6 +32,7 @@ namespace UnmanagedArray
 
             var newBuffer = Allocator.Allocate<T>(newLength, true);
             Allocator.Copy<T>(newBuffer, oldBuffer, oldLength);
+            Allocator.Free(oldBuffer);
 
             Buffer = newBuffer;
             Length = newLength;
