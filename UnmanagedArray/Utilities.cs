@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace UnmanagedArray
@@ -17,6 +18,8 @@ namespace UnmanagedArray
         public static Array<T> ToEnormousArray<T>(this IEnumerable<T> source)
             where T : struct
         {
+            if (source == null) throw new ArgumentNullException(nameof(source));
+
             Array<T> target;
             if (source is IList<T> sourceAsList)
             {

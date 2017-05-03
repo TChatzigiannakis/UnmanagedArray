@@ -41,6 +41,7 @@ namespace UnmanagedArray
         public Array(long count, Func<long, T> initializer)
             : this(count, false)
         {
+            if (initializer == null) throw new ArgumentNullException(nameof(initializer));
             for(var i = 0L; i < Length; i++)
             {
                 UnsafeSet(i, initializer(i));

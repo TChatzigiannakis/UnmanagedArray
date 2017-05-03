@@ -9,6 +9,8 @@ namespace UnmanagedArray
 
         public void Resize(long newLength)
         {
+            if (newLength < 0) throw new ArgumentException(nameof(newLength));
+
             var oldBuffer = Buffer;
             var oldLength = Length;
 
@@ -36,11 +38,13 @@ namespace UnmanagedArray
 
         public void CopyFrom(T[] source)
         {
+            if (source == null) throw new ArgumentNullException(nameof(source));
             Allocator.Copy(this, source);
         }
 
         public void CopyTo(T[] target)
         {
+            if (target == null) throw new ArgumentNullException(nameof(target));
             var len = checked((int)Math.Min(Length, target.Length));
             Allocator.Copy(target, this);
         }        
