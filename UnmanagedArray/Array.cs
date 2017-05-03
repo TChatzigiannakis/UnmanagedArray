@@ -11,7 +11,16 @@ namespace UnmanagedArray
     {
         private static bool IsZeroBit(T element) => Equals(element, default(T));
 
+        /// <summary>
+        /// Gets the total number of elements in the array.
+        /// </summary>
         public long Length { get; private set; }
+
+        /// <summary>
+        /// Gets or sets the element at the specified index.
+        /// </summary>
+        /// <param name="index"></param>
+        /// <returns></returns>
         public T this[long index]
         {
             get => UnsafeGet(EnsureInRange(index));
@@ -25,11 +34,20 @@ namespace UnmanagedArray
 
         private IAllocator Allocator = new Win32GlobalAllocator();
 
+        /// <summary>
+        /// Creates an array with the specified size initialized to the default value of the element type.
+        /// </summary>
+        /// <param name="count"></param>
         public Array(long count)
             : this(count, true)
         {
         }
 
+        /// <summary>
+        /// Creates an array with the specified size initialized to the default value of the element type, using the provided allocator.
+        /// </summary>
+        /// <param name="count"></param>
+        /// <param name="allocator"></param>
         public Array(long count, IAllocator allocator)
         {
             if (count < 0) throw new ArgumentException(nameof(count));
@@ -38,6 +56,11 @@ namespace UnmanagedArray
             Buffer = Allocator.Allocate<T>(count, true);
         }
 
+        /// <summary>
+        /// Creates an array with the specified size initialized using the specified generator function.
+        /// </summary>
+        /// <param name="count"></param>
+        /// <param name="initializer"></param>
         public Array(long count, Func<long, T> initializer)
             : this(count, false)
         {
@@ -48,11 +71,21 @@ namespace UnmanagedArray
             }
         }
 
+        /// <summary>
+        /// Creates an array with the specified size initialized using the specified generator function.
+        /// </summary>
+        /// <param name="count"></param>
+        /// <param name="initializer"></param>
         public Array(long count, Func<T> initializer)
             : this(count, x => initializer())
         {
         }
 
+        /// <summary>
+        /// Creates an array with the specified size initialized using the specified value.
+        /// </summary>
+        /// <param name="count"></param>
+        /// <param name="initialValue"></param>
         public Array(long count, T initialValue)
             : this(count, IsZeroBit(initialValue))
         {
@@ -65,6 +98,9 @@ namespace UnmanagedArray
             }
         }
 
+        /// <summary>
+        /// Creates an array with the specified size with the option to initialize using the default value or leave the initial values unspecified.
+        /// </summary>
         public Array(long count, bool clear)
         {
             if (count < 0) throw new ArgumentException(nameof(count));
@@ -90,6 +126,9 @@ namespace UnmanagedArray
             throw new IndexOutOfRangeException();
         }
 
+        /// <summary>
+        /// Frees the backing memory used by the array and sets the size to zero.
+        /// </summary>
         public void Dispose()
         {
             Allocator.Free(Buffer);
