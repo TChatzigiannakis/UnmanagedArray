@@ -32,7 +32,8 @@ namespace UnmanagedArray
 
         public Array(long count, IAllocator allocator)
         {
-            Allocator = allocator;
+            if (count < 0) throw new ArgumentException(nameof(count));
+            Allocator = allocator ?? throw new ArgumentNullException(nameof(allocator));
             Length = count;
             Buffer = Allocator.Allocate<T>(count, true);
         }
@@ -65,6 +66,7 @@ namespace UnmanagedArray
 
         public Array(long count, bool clear)
         {
+            if (count < 0) throw new ArgumentException(nameof(count));
             Length = count;
             Buffer = Allocator.Allocate<T>(count, clear);
         }
