@@ -9,6 +9,8 @@ namespace UnmanagedArray
     public unsafe partial class Array<T> : IDisposable
         where T : struct
     {
+        private static bool IsZeroBit(T element) => Equals(element, default(T));
+
         public long Length { get; private set; }
         public T this[long index]
         {
@@ -50,11 +52,14 @@ namespace UnmanagedArray
         }
 
         public Array(long count, T initialValue)
-            : this(count, false)
+            : this(count, IsZeroBit(initialValue))
         {
-            for (var i = 0L; i < Length; i++)
+            if (!IsZeroBit(initialValue))
             {
-                UnsafeSet(i, initialValue);
+                for (var i = 0L; i < Length; i++)
+                {
+                    UnsafeSet(i, initialValue);
+                }
             }
         }
 
