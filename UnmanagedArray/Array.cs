@@ -116,7 +116,7 @@ namespace UnmanagedArray
 
         private IntPtr AddressOf(long index) => new IntPtr((byte*)Buffer + Marshal.SizeOf<T>() * index);
 
-        private T UnsafeGet(long index) => (T)Marshal.PtrToStructure(AddressOf(index), typeof(T));
+        private T UnsafeGet(long index) => Marshal.PtrToStructure<T>(AddressOf(index));
 
         private void UnsafeSet(long index, T value)
         {
