@@ -5,6 +5,10 @@ using System.Runtime.InteropServices;
 
 namespace UnmanagedArray
 {
+    /// <summary>
+    /// Represents an array of structs stored in unmanaged memory.
+    /// </summary>
+    /// <typeparam name="T">The type of the array's elements. Must be a value type.</typeparam>
     [DebuggerDisplay("Length = {Length}")]
     public unsafe partial class Array<T> : IDisposable
         where T : struct
@@ -19,7 +23,7 @@ namespace UnmanagedArray
         /// <summary>
         /// Gets or sets the element at the specified index.
         /// </summary>
-        /// <param name="index"></param>
+        /// <param name="index">The index of the accessed element, starting from 0.</param>
         /// <returns></returns>
         public T this[long index]
         {
@@ -31,13 +35,12 @@ namespace UnmanagedArray
         }
 
         internal IntPtr Buffer;
-
-        private IAllocator Allocator = new Win32GlobalAllocator();
+        private readonly IAllocator Allocator = new Win32GlobalAllocator();
 
         /// <summary>
         /// Creates an array with the specified size initialized to the default value of the element type.
         /// </summary>
-        /// <param name="count"></param>
+        /// <param name="count">The initial capacity of the array.</param>
         public Array(long count)
             : this(count, true)
         {
@@ -46,8 +49,8 @@ namespace UnmanagedArray
         /// <summary>
         /// Creates an array with the specified size initialized to the default value of the element type, using the provided allocator.
         /// </summary>
-        /// <param name="count"></param>
-        /// <param name="allocator"></param>
+        /// <param name="count">The initial capacity of the array.</param>
+        /// <param name="allocator">The allocator that will be used to allocate and release the backing storage.</param>
         public Array(long count, IAllocator allocator)
         {
             if (count < 0) throw new ArgumentException(nameof(count));
@@ -59,8 +62,8 @@ namespace UnmanagedArray
         /// <summary>
         /// Creates an array with the specified size initialized using the specified generator function.
         /// </summary>
-        /// <param name="count"></param>
-        /// <param name="initializer"></param>
+        /// <param name="count">The initial capacity of the array.</param>
+        /// <param name="initializer">A function of the index that will be used to generate default values for each element of the array.</param>
         public Array(long count, Func<long, T> initializer)
             : this(count, false)
         {
@@ -74,8 +77,8 @@ namespace UnmanagedArray
         /// <summary>
         /// Creates an array with the specified size initialized using the specified generator function.
         /// </summary>
-        /// <param name="count"></param>
-        /// <param name="initializer"></param>
+        /// <param name="count">The initial capacity of the array.</param>
+        /// <param name="initializer">A parameterless function that will be used to generate default values for each element of the array.</param>
         public Array(long count, Func<T> initializer)
             : this(count, x => initializer())
         {
@@ -84,8 +87,8 @@ namespace UnmanagedArray
         /// <summary>
         /// Creates an array with the specified size initialized using the specified value.
         /// </summary>
-        /// <param name="count"></param>
-        /// <param name="initialValue"></param>
+        /// <param name="count">The initial capacity of the array.</param>
+        /// <param name="initialValue">The initial value for each element of the array.</param>
         public Array(long count, T initialValue)
             : this(count, IsZeroBit(initialValue))
         {
@@ -101,6 +104,9 @@ namespace UnmanagedArray
         /// <summary>
         /// Creates an array with the specified size with the option to initialize using the default value or leave the initial values unspecified.
         /// </summary>
+        /// <param name="count">The initial capacity of the array.</param>
+        /// <param name="clear">If true, the array will be initialized to the default value of T. If false, the individual values will be unspecified and may represent invalid instances of T.
+        /// Passing false is not recommended unless you intend to explicitly initialize all elements to something other than their default value.</param>
         public Array(long count, bool clear)
         {
             if (count < 0) throw new ArgumentException(nameof(count));

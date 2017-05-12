@@ -3,10 +3,6 @@ using System;
 
 namespace UnmanagedArray
 {
-    /// <summary>
-    /// Represents an array of structs stored in unmanaged memory.
-    /// </summary>
-    /// <typeparam name="T">The type of the array's elements. Must be a value type.</typeparam>
     public unsafe partial class Array<T>
     {
         public static implicit operator IntPtr(Array<T> e) => e.Buffer;
@@ -50,7 +46,7 @@ namespace UnmanagedArray
         }
 
         /// <summary>
-        /// Copies elements from a managed C# array to this one.
+        /// Copies elements from a managed CLR array to this one.
         /// </summary>
         /// <param name="source"></param>
         public void CopyFrom(T[] source)
