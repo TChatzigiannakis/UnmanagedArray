@@ -3,6 +3,9 @@ using System.Runtime.InteropServices;
 
 namespace UnmanagedArray.Allocators
 {
+    /// <summary>
+    /// Represents an object that can allocate, release, and copy memory.
+    /// </summary>
     public interface IAllocator
     {
         IntPtr Allocate<T>(long size, bool zeroInit);

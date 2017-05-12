@@ -81,7 +81,7 @@ namespace Tests
         [Test]
         [TestCase(5, 10)]
         [TestCase(4096, 8192)]
-        [TestCase(1024 * 1024, 4L * 1024 * 1024 * 1024, false)]
+        [TestCase(1024 * 1024, 2L * 1024 * 1024 * 1024, false)]
         public void Resize(long initialLength, long newLength, bool verifyBeyondOldBoundary = true)
         {
             Require64();
@@ -107,6 +107,52 @@ namespace Tests
                     }
                 }
             }
+        }
+
+        [Test]
+        public void BreakEnumerator()
+        {
+            using (var arr = new Array<long>(5, 1))
+            {
+                var sum = arr.Sum(x =>
+                {
+                    arr.Resize(arr.Length - 1);
+                    return x;
+                });
+                Assert.AreEqual(3, sum);
+            }
+        }
+
+        [Test]
+        public void Performance([Values(16 * MB, 32 * MB, 64 * MB, 128 * MB, 256 * MB)] long size)
+        {
+            Require64();
+
+            var sw = new Stopwatch();
+            (var managedWriteTime, var managed) = sw.Measure(() =>
+            {
+                var arr = new int[size];
+                for (var i = 0; i < arr.Length; i++)
+                {
+                    arr[i] = 1;
+                }
+                return arr;
+            });
+            (var managedReadTime, var managedSum) = sw.Measure(() => managed.Sum());
+            (var unmanagedWriteTime, var unmanaged) = sw.Measure(() => new Array<int>(size, 1));
+            (var unmanagedReadTime, var unmanagedSum) = sw.Measure(() => unmanaged.Sum());
+
+            var writeRatio = unmanagedWriteTime / (decimal)managedWriteTime;
+            Console.WriteLine($"Managed array write time: {managedWriteTime}ms");
+            Console.WriteLine($"Unmanaged array write time: {unmanagedWriteTime}ms");
+            Console.WriteLine($"Ratio: {writeRatio.ToString("0.##")}");
+
+            var readRatio = unmanagedReadTime / (decimal)managedReadTime;
+            Console.WriteLine($"Managed array read time: {managedReadTime}ms");
+            Console.WriteLine($"Unmanaged array read time: {unmanagedReadTime}ms");
+            Console.WriteLine($"Ratio: {readRatio.ToString("0.##")}");
+
+            Assert.AreEqual(managedSum, unmanagedSum);
         }
     }
 }

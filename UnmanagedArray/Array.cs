@@ -1,7 +1,7 @@
 ﻿using UnmanagedArray.Allocators;
 using System;
 using System.Diagnostics;
-using System.Runtime.InteropServices;
+using System.Runtime.CompilerServices;
 
 namespace UnmanagedArray
 {
@@ -27,7 +27,10 @@ namespace UnmanagedArray
         /// <returns></returns>
         public T this[long index]
         {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get => UnsafeGet(EnsureInRange(index));
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             set
             {
                 UnsafeSet(EnsureInRange(index), value);
@@ -114,15 +117,7 @@ namespace UnmanagedArray
             Buffer = Allocator.Allocate<T>(count, clear);
         }
 
-        private IntPtr AddressOf(long index) => new IntPtr((byte*)Buffer + Marshal.SizeOf<T>() * index);
-
-        private T UnsafeGet(long index) => Marshal.PtrToStructure<T>(AddressOf(index));
-
-        private void UnsafeSet(long index, T value)
-        {
-            Marshal.StructureToPtr(value, AddressOf(index), false);
-        }
-        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private long EnsureInRange(long index)
         {
             if (0 <= index && index < Length)
