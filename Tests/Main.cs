@@ -106,26 +106,33 @@ namespace Tests
         {
             Require64();
 
-            Func<long, long> f = i => i * i;
-            using (var arr = new Array<long>(initialLength, f))
+            try
             {
-                Assert.AreEqual(initialLength, arr.Length);
-
-                arr.Resize(newLength);
-                Assert.AreEqual(newLength, arr.Length);
-
-                var end = verifyBeyondOldBoundary ? newLength : initialLength;
-                for (var i = 0L; i < end; i++)
+                Func<long, long> f = i => i * i;
+                using (var arr = new Array<long>(initialLength, f))
                 {
-                    if (i < initialLength)
+                    Assert.AreEqual(initialLength, arr.Length);
+
+                    arr.Resize(newLength);
+                    Assert.AreEqual(newLength, arr.Length);
+
+                    var end = verifyBeyondOldBoundary ? newLength : initialLength;
+                    for (var i = 0L; i < end; i++)
                     {
-                        Assert.AreEqual(f(i), arr[i]);
-                    }
-                    else
-                    {
-                        Assert.AreEqual(0, arr[i]);
+                        if (i < initialLength)
+                        {
+                            Assert.AreEqual(f(i), arr[i]);
+                        }
+                        else
+                        {
+                            Assert.AreEqual(0, arr[i]);
+                        }
                     }
                 }
+            }
+            catch (OutOfMemoryException)
+            {
+                Assert.Inconclusive();
             }
         }
 
