@@ -24,7 +24,7 @@ namespace Tests
 
         private void RequireMem(long req)
         {
-            var mem = (decimal)(new ComputerInfo()).AvailableVirtualMemory;
+            var mem = (decimal)(new ComputerInfo()).AvailablePhysicalMemory;
             if(2 * mem < req)
             {
                 Assert.Inconclusive();
