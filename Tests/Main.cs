@@ -22,15 +22,6 @@ namespace Tests
             }
         }
 
-        private void RequireMem(long req)
-        {
-            var mem = (decimal)(new ComputerInfo()).AvailablePhysicalMemory;
-            if(2 * mem < req)
-            {
-                Assert.Inconclusive();
-            }
-        }
-
         [Test]
         public void ZeroInit()
         {
@@ -41,14 +32,32 @@ namespace Tests
         }
 
         [Test]
-        public void VeryLargeAllocation([Values(1, 2, 4, 8, 16, 32)] long gigaBytes)
+        [TestCase(1)]
+        [TestCase(2)]
+        [TestCase(4, true)]
+        [TestCase(8, true)]
+        [TestCase(16, true)]
+        public void VeryLargeAllocation(long gigaBytes, bool optional = false)
         {
             Require64();
-            RequireMem(gigaBytes * GB);
-            using (var arr = new Array<byte>(gigaBytes * GB))
+            try
             {
-                arr[0] = 255;
-                arr[arr.Length - 1] = 255;
+                using (var arr = new Array<byte>(gigaBytes * GB))
+                {
+                    arr[0] = 255;
+                    arr[arr.Length - 1] = 255;
+                }
+            }
+            catch (OutOfMemoryException)
+            {
+                if(optional)
+                {
+                    Assert.Inconclusive();
+                }
+                else
+                {
+                    throw;
+                }
             }
         }
 
