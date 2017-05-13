@@ -7,20 +7,8 @@ using System.Diagnostics;
 namespace Tests
 {
     [TestFixture]
-    public class Main
+    public class Main : Common
     {
-        private const long KB = 1024;
-        private const long MB = 1024 * KB;
-        private const long GB = 1024 * MB;
-
-        private void Require64()
-        {
-            if (!Environment.Is64BitProcess)
-            {
-                Assert.Inconclusive();
-            }
-        }
-
         [Test]
         public void ZeroInit()
         {
@@ -124,35 +112,31 @@ namespace Tests
         }
 
         [Test]
-        public void Performance([Values(16 * MB, 32 * MB, 64 * MB, 128 * MB, 256 * MB)] long size)
+        public void ClassArray()
         {
-            Require64();
-
-            var sw = new Stopwatch();
-            (var managedWriteTime, var managed) = sw.Measure(() =>
+            using (var arr = new Array<string>(5, x => x.ToString()))
             {
-                var arr = new int[size];
-                for (var i = 0; i < arr.Length; i++)
+                GC.AddMemoryPressure(4 * GB);
+                GC.Collect();
+                for (var i = 0L; i < arr.Length; i++)
                 {
-                    arr[i] = 1;
+                    Assert.AreEqual(i.ToString(), arr[i]);
                 }
-                return arr;
-            });
-            (var managedReadTime, var managedSum) = sw.Measure(() => managed.Sum());
-            (var unmanagedWriteTime, var unmanaged) = sw.Measure(() => new Array<int>(size, 1));
-            (var unmanagedReadTime, var unmanagedSum) = sw.Measure(() => unmanaged.Sum());
-
-            var writeRatio = unmanagedWriteTime / (decimal)managedWriteTime;
-            Console.WriteLine($"Managed array write time: {managedWriteTime}ms");
-            Console.WriteLine($"Unmanaged array write time: {unmanagedWriteTime}ms");
-            Console.WriteLine($"Ratio: {writeRatio.ToString("0.##")}");
-
-            var readRatio = unmanagedReadTime / (decimal)managedReadTime;
-            Console.WriteLine($"Managed array read time: {managedReadTime}ms");
-            Console.WriteLine($"Unmanaged array read time: {unmanagedReadTime}ms");
-            Console.WriteLine($"Ratio: {readRatio.ToString("0.##")}");
-
-            Assert.AreEqual(managedSum, unmanagedSum);
+                GC.AddMemoryPressure(4 * GB);
+                GC.Collect();
+                for (var i = 0L; i < arr.Length; i++)
+                {
+                    arr[i] = "";
+                }
+                GC.AddMemoryPressure(4 * GB);
+                GC.Collect();
+                for (var i = 0L; i < arr.Length; i++)
+                {
+                    Assert.AreEqual("", arr[i]);
+                }
+            }
         }
+
+
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 namespace UnmanagedArray.Allocators
@@ -13,7 +14,7 @@ namespace UnmanagedArray.Allocators
 
         public IntPtr Allocate<T>(long count, bool zeroInit)
         {
-            var ptr = GlobalAlloc(zeroInit ? 0x0040u : 0x0000u, Marshal.SizeOf<T>() * count);
+            var ptr = GlobalAlloc(zeroInit ? 0x0040u : 0x0000u, Unsafe.SizeOf<T>() * count);
             if(ptr == IntPtr.Zero)
             {
                 throw new OutOfMemoryException();
@@ -28,7 +29,7 @@ namespace UnmanagedArray.Allocators
 
         public void Copy<T>(IntPtr target, IntPtr source, long count)
         {
-            CopyMemory(target, source, count * Marshal.SizeOf<T>());
+            CopyMemory(target, source, count * Unsafe.SizeOf<T>());
         }
     }
 }

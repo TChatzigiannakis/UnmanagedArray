@@ -1,20 +1,24 @@
-﻿using System;
+﻿using NUnit.Framework;
+using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Tests
 {
-    internal static class Common
+    public abstract class Common
     {
-        public static (long time, T result) Measure<T>(this Stopwatch stopwatch, Func<T> act)
+        protected const long KB = 1024;
+        protected const long MB = 1024 * KB;
+        protected const long GB = 1024 * MB;
+
+        protected void Require64()
         {
-            stopwatch.Restart();
-            var result = act();
-            stopwatch.Stop();
-            return (stopwatch.ElapsedMilliseconds, result);
+            if (!Environment.Is64BitProcess)
+            {
+                Assert.Inconclusive();
+            }
         }
     }
 }

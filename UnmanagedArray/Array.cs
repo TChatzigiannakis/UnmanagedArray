@@ -11,7 +11,7 @@ namespace UnmanagedArray
     /// <typeparam name="T">The type of the array's elements. Must be a value type.</typeparam>
     [DebuggerDisplay("Length = {Length}")]
     public unsafe partial class Array<T> : IDisposable
-        where T : struct
+        //where T : struct
     {
         private static bool IsZeroBit(T element) => Equals(element, default(T));
 
@@ -114,7 +114,7 @@ namespace UnmanagedArray
         {
             if (count < 0) throw new ArgumentException(nameof(count));
             Length = count;
-            Buffer = Allocator.Allocate<T>(count, clear);
+            Buffer = Allocator.Allocate<T>(count, clear || IsReferenceType);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
