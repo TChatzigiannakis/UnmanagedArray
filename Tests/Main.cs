@@ -31,7 +31,7 @@ namespace Tests
         }
 
         [Test]
-        public void VeryLargeAllocation([Values(1, 2, 4, 8)] long gigaBytes)
+        public void VeryLargeAllocation([Values(1, 2, 4)] long gigaBytes)
         {
             Require64();
             using(var arr = new Array<byte>(gigaBytes * GB))
