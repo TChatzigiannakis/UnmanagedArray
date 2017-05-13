@@ -8,12 +8,12 @@ namespace UnmanagedArray.Allocators
     /// </summary>
     public interface IAllocator
     {
-        IntPtr Allocate<T>(long size, bool zeroInit);
+        IntPtr Allocate<T>(long count, bool zeroInit);
         void Free(IntPtr buffer);
         void Copy<T>(IntPtr destination, IntPtr source, long count);
     }
 
-    internal static class Allocator
+    internal static unsafe class Allocator
     {
         public static void Copy<T>(this IAllocator allocator, IntPtr target, T[] source)
         {

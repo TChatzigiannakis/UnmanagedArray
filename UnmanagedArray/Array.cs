@@ -13,6 +13,8 @@ namespace UnmanagedArray
     public unsafe partial class Array<T> : IDisposable
         where T : struct
     {
+        internal static IAllocator DefaultAllocator => new Win32HeapAllocator();
+
         private static bool IsZeroBit(T element) => Equals(element, default(T));
 
         /// <summary>
@@ -38,7 +40,7 @@ namespace UnmanagedArray
         }
 
         internal IntPtr Buffer;
-        private readonly IAllocator Allocator = new Win32GlobalAllocator();
+        private readonly IAllocator Allocator = DefaultAllocator;
 
         /// <summary>
         /// Creates an array with the specified size initialized to the default value of the element type.
@@ -59,7 +61,8 @@ namespace UnmanagedArray
             if (count < 0) throw new ArgumentException(nameof(count));
             Allocator = allocator ?? throw new ArgumentNullException(nameof(allocator));
             Length = count;
-            Buffer = Allocator.Allocate<T>(count, true);
+            var buff = Allocator.Allocate<T>(count, true);
+            Buffer = RequireNotNull(buff);
         }
 
         /// <summary>
@@ -114,18 +117,15 @@ namespace UnmanagedArray
         {
             if (count < 0) throw new ArgumentException(nameof(count));
             Length = count;
-            Buffer = Allocator.Allocate<T>(count, clear);
+            var buff = Allocator.Allocate<T>(count, clear);
+            Buffer = RequireNotNull(buff);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private long EnsureInRange(long index)
-        {
-            if (0 <= index && index < Length)
-            {
-                return index;
-            }
-            throw new IndexOutOfRangeException();
-        }
+        private bool InRange(long index) => 0 <= index && index < Length;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private long EnsureInRange(long index) => InRange(index) ? index : throw new IndexOutOfRangeException();
 
         /// <summary>
         /// Frees the backing memory used by the array and sets the size to zero.

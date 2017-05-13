@@ -1,10 +1,14 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System;
+using System.Runtime.CompilerServices;
 
 namespace UnmanagedArray
 {
     public unsafe partial class Array<T>
     {
         private readonly static int Size = Unsafe.SizeOf<T>();
+
+        private void* RequireNotNull(void* ptr) => ptr == (void*)0 ? throw new OutOfMemoryException() : ptr;
+        private IntPtr RequireNotNull(IntPtr ptr) => ptr == IntPtr.Zero ? throw new OutOfMemoryException() : ptr;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void* AddressOf(long index) => (byte*)Buffer + Size * index;

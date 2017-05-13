@@ -3,6 +3,7 @@ using UnmanagedArray;
 using System;
 using System.Linq;
 using System.Diagnostics;
+using Microsoft.VisualBasic.Devices;
 
 namespace Tests
 {
@@ -21,6 +22,15 @@ namespace Tests
             }
         }
 
+        private void RequireMem(long req)
+        {
+            var mem = (decimal)(new ComputerInfo()).AvailableVirtualMemory;
+            if(2 * mem < req)
+            {
+                Assert.Inconclusive();
+            }
+        }
+
         [Test]
         public void ZeroInit()
         {
@@ -31,10 +41,11 @@ namespace Tests
         }
 
         [Test]
-        public void VeryLargeAllocation([Values(1, 2, 4)] long gigaBytes)
+        public void VeryLargeAllocation([Values(1, 2, 4, 8, 16, 32)] long gigaBytes)
         {
             Require64();
-            using(var arr = new Array<byte>(gigaBytes * GB))
+            RequireMem(gigaBytes * GB);
+            using (var arr = new Array<byte>(gigaBytes * GB))
             {
                 arr[0] = 255;
                 arr[arr.Length - 1] = 255;
@@ -112,14 +123,17 @@ namespace Tests
         [Test]
         public void BreakEnumerator()
         {
-            using (var arr = new Array<long>(5, 1))
+            for(var i = 0; i < 100000; i++)
             {
-                var sum = arr.Sum(x =>
+                using (var arr = new Array<long>(5, 1))
                 {
-                    arr.Resize(arr.Length - 1);
-                    return x;
-                });
-                Assert.AreEqual(3, sum);
+                    var sum = arr.Sum(x =>
+                    {
+                        arr.Resize(arr.Length - 1);
+                        return x;
+                    });
+                    Assert.AreEqual(3, sum);
+                }
             }
         }
 
@@ -141,6 +155,7 @@ namespace Tests
             (var managedReadTime, var managedSum) = sw.Measure(() => managed.Sum());
             (var unmanagedWriteTime, var unmanaged) = sw.Measure(() => new Array<int>(size, 1));
             (var unmanagedReadTime, var unmanagedSum) = sw.Measure(() => unmanaged.Sum());
+            unmanaged.Dispose();
 
             var writeRatio = unmanagedWriteTime / (decimal)managedWriteTime;
             Console.WriteLine($"Managed array write time: {managedWriteTime}ms");

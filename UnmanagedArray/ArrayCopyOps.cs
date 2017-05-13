@@ -27,7 +27,8 @@ namespace UnmanagedArray
             Length = default(long);
 
             var newBuffer = Allocator.Allocate<T>(newLength, true);
-            Allocator.Copy<T>(newBuffer, oldBuffer, oldLength);
+            RequireNotNull(newBuffer);
+            Allocator.Copy<T>(newBuffer, oldBuffer, Math.Min(oldLength, newLength));
             Allocator.Free(oldBuffer);
 
             Buffer = newBuffer;

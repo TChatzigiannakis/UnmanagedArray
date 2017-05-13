@@ -84,6 +84,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Allocators\Native.cs" />
+    <Compile Include="Allocators\Win32Allocator.cs" />
+    <Compile Include="Allocators\Win32GlobalAllocator.cs" />
+    <Compile Include="Allocators\Win32HeapAllocator.cs" />
     <Compile Include="Array.cs" />
     <Compile Include="ArrayEnumerableImpl.cs" />
     <Compile Include="ArrayCopyOps.cs" />
@@ -91,7 +94,6 @@
     <Compile Include="ArrayPtrOps.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utilities.cs" />
-    <Compile Include="Allocators\Win32KernelAllocator.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

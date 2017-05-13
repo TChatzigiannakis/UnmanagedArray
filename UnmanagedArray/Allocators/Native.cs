@@ -2,7 +2,7 @@
 
 namespace UnmanagedArray.Allocators
 {
-    internal struct Native
+    public struct Native
     {
         public IntPtr Value { get; }
 
